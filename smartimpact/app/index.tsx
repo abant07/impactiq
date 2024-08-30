@@ -6,7 +6,7 @@ import { createWeb3Modal, defaultWagmiConfig, Web3Modal, useWeb3Modal } from '@w
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 
 const queryClient = new QueryClient()
-const projectId = 'bb375bdc8cf95de4508136103acf0c43'
+const projectId = ''
 const metadata = {
     name: 'ImpactIQ',
     description: 'DIMO Crash Detection App',
