@@ -181,7 +181,7 @@ export default function Permission() {
                                         />
                                 </View>
                                 
-                                <TouchableOpacity style={styles.button} onPress={givePermission(token)}>
+                                <TouchableOpacity style={styles.button} onPress={() => givePermission(token)}>
                                     <Text style={styles.buttonText}>Give Permission</Text>
                                 </TouchableOpacity>
                             </>
