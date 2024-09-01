@@ -30,6 +30,7 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="screens/map" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );

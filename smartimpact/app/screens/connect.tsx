@@ -2,14 +2,14 @@ import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { useAccount } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi-react-native';
 import { useFonts } from 'expo-font';
-import Permission from './vehicles';
+import Vehicle from './vehicles';
 
-export default function Vehicles() {
+export default function Connect() {
     const { open } = useWeb3Modal();
     const { isConnected, isConnecting } = useAccount();
 
     const [fontsLoaded] = useFonts({
-        'SpaceMono-Regular': require('../assets/fonts/SpaceMono-Regular.ttf'),
+        'SpaceMono-Regular': require('../../assets/fonts/SpaceMono-Regular.ttf'),
     });
 
     if (!fontsLoaded) {
@@ -18,12 +18,12 @@ export default function Vehicles() {
 
     if (isConnected) {
         return (
-            <Permission />
+            <Vehicle />
         );
     } else {
         return (
             <View style={styles.container}>
-                <Image style={styles.image} source={require('../assets/images/dimo.png')} />
+                <Image style={styles.image} source={require('../../assets/images/dimo.png')} />
                 <Text style={styles.text}>Log in with DIMO</Text>
                 <TouchableOpacity style={styles.connect} onPress={() => open()}>
                     <Text style={styles.connectText}>{isConnecting ? "Connecting..." : "Connect Wallet"}</Text>

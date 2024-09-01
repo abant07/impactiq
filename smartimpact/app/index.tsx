@@ -3,10 +3,13 @@ import { WagmiProvider } from 'wagmi'
 import { polygon } from '@wagmi/core/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createWeb3Modal, defaultWagmiConfig, Web3Modal } from '@web3modal/wagmi-react-native'
-import Vehicles from './connect'
+import Connect from './screens/connect'
+import { store } from '../store';
+import { Provider } from "react-redux"
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 const queryClient = new QueryClient()
-const projectId = ''
+const projectId = 'bb375bdc8cf95de4508136103acf0c43'
 const metadata = {
     name: 'ImpactIQ',
     description: 'DIMO Crash Detection App',
@@ -29,13 +32,18 @@ createWeb3Modal({
     enableAnalytics: true
 })
 
+
 export default function HomeScreen() {
     return (
-        <WagmiProvider config={wagmiConfig} reconnectOnMount={true}>
-            <QueryClientProvider client={queryClient}>
-                <Vehicles/>
-                <Web3Modal />
-            </QueryClientProvider>
-        </WagmiProvider>
+        <Provider store={store}>
+            <SafeAreaProvider>
+                <WagmiProvider config={wagmiConfig} reconnectOnMount={true}>
+                    <QueryClientProvider client={queryClient}>
+                        <Connect/>
+                        <Web3Modal />
+                    </QueryClientProvider>
+                </WagmiProvider>
+            </SafeAreaProvider>
+        </Provider>
     );    
 }

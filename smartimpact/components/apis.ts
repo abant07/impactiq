@@ -1,9 +1,10 @@
 "use strict";
 export async function vehicles(ownerAddress: string) {
     const url = "https://identity-api.dimo.zone/query";
+    // TODO: replace address with ${ownerAddress}
     const myQuery = `
         {
-            vehicles(first: 10, filterBy: {owner: "0xB8E514da5E7b2918AebC139ae7CbEFc3727f05D3"}) {
+            vehicles(first: 10, filterBy: {owner: "0xf9D26323Ab49179A6d57C26515B01De018553787"}) { 
                 nodes {
                     tokenId
                     owner
