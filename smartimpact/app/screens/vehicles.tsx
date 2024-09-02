@@ -28,8 +28,7 @@ export default function Vehicle() {
         const getVehicles = async () => {
             try {
                 const data = await vehicles(address ? address : "");
-                console.log('API Data:', data.data.vehicles.nodes);
-                setVehicleData(data.data.vehicles.nodes);
+                setVehicleData(data);
             } catch (error) {
                 console.error('Error fetching vehicles:', error);
             }
@@ -96,7 +95,7 @@ export default function Vehicle() {
                     </View>
 
                     <Text style={styles.title}>Your Vehicles</Text>
-                    <Text style={styles.subtitle}>Choose the vehicle you want to drive to give permission.</Text>
+                    <Text style={styles.subtitle}>Grant permission to use vehicle data for crash detection</Text>
                     {vehicleData.length > 0 ? (
                         <View style={styles.radioContainer}>
                             {vehicleData.map((vehicle) => (
@@ -117,7 +116,7 @@ export default function Vehicle() {
                             ))}
                         </View>
                     ) : (
-                        <Text style={styles.noVehiclesText}>No vehicles registered with DIMO</Text>
+                        <Text style={styles.noVehiclesText}>No vehicles are left to give permission</Text>
                     )}
                 </ScrollView>
 
@@ -230,7 +229,6 @@ const styles = StyleSheet.create({
     radioButton: {
         backgroundColor: "#1F2937",
         paddingVertical: 20,
-        paddingHorizontal: 50,
         borderRadius: 10,
         marginVertical: 8,
         width: '100%',

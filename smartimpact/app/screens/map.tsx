@@ -1,29 +1,24 @@
-import { View, SafeAreaView, StyleSheet, Image } from 'react-native';
+import { View } from 'react-native';
 import React from "react"
 import tw from 'tailwind-react-native-classnames';
-import NavOptions from '@/components/NavOptions';
+import Satellite from './Satellite'
+import { createStackNavigator } from '@react-navigation/stack';
+import SearchDestination from './SearchDestination';
+import ChooseVehicle from './chooseVehicle';
 
 export default function Map() {
+    const Stack = createStackNavigator()
     return (
-        <SafeAreaView style={tw`bg-white h-full`}>
-            <View style={tw`p-5`}>
-                <Image 
-                    style={{
-                        width: 100, 
-                        height: 100, 
-                        resizeMode: "contain"
-                    }}
-                    source={{
-                        uri: "https://links.papareact.com/gzs"
-                    }}
-                />
-
-                <NavOptions/>
+        <View>
+            <View style={tw`h-1/2`}>
+                <Satellite/>
             </View>
-        </SafeAreaView>
+            <View style={tw`h-1/2`}>
+                <Stack.Navigator screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="SearchDestination" component={SearchDestination} options={{ headerShown: false}}/>
+                    <Stack.Screen name="ChooseVehicle" component={ChooseVehicle} options={{ headerShown: false}} />
+                </Stack.Navigator>
+            </View>
+        </View>
     )
 }
-
-const styles = StyleSheet.create({
-
-})
