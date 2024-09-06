@@ -4,7 +4,7 @@ import tw from 'tailwind-react-native-classnames';
 import Satellite from './Satellite'
 import { createStackNavigator } from '@react-navigation/stack';
 import SearchDestination from './SearchDestination';
-import ChooseVehicle from './ChooseVehicle';
+import ChooseVehicle from './chooseVehicle';
 
 export default function Map() {
     const Stack = createStackNavigator()

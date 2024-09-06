@@ -1,4 +1,4 @@
-import Connect from './screens/Connect'
+import Connect from './screens/connect'
 
 export default function HomeScreen() {
     return (

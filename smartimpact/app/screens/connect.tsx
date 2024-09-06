@@ -2,7 +2,7 @@ import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { useAccount } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi-react-native';
 import { useFonts } from 'expo-font';
-import Vehicle from './Vehicles';
+import Vehicle from './vehicles';
 
 export default function Connect() {
     const { open } = useWeb3Modal();

@@ -4,7 +4,7 @@ import { useWeb3Modal } from '@web3modal/wagmi-react-native';
 import { useFonts } from 'expo-font';
 import React, { useState, useEffect } from 'react';
 import { vehicles, vehicleStats } from '../../components/apis';
-import Connect from './Connect';
+import Connect from './connect';
 import dimoABI from "../../components/abi.json";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
