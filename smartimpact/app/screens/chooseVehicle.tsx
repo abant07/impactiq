@@ -23,6 +23,7 @@ const ChooseVehicle = () => {
             console.error('Error fetching vehicles:', error);
         }
     };
+    
     getVehicles()
         .catch(() => console.log("Error with getting vehicles"));
   }, []);
@@ -34,7 +35,7 @@ const ChooseVehicle = () => {
         const {currentLocationLatitude, currentLocationLongitude} = await getTelemetry(data, vehicleId)
         dispatch(setOrigin({
             location: {lat: currentLocationLatitude, lng: currentLocationLongitude},
-            description: "Trip Origin"
+            description: `(${currentLocationLatitude},${currentLocationLongitude})`
         }))
         setSelectedVehicleId(vehicleId);
     } catch (error) {

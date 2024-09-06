@@ -30,11 +30,17 @@ const Satellite = () => {
         }}>
           {origin && destination && (
             <MapViewDirections
-              origin={origin.description}
-              destination={destination.description}
+              origin={{
+                latitude: origin?.location.lat || 37.7825,
+                longitude: origin?.location.lng || 37.7825
+              }}
+              destination={{
+                latitude: destination?.location.lat || 37.7825,
+                longitude: destination?.location.lng || 37.7825
+              }}
               apikey={process.env.EXPO_PUBLIC_GOOGLE_API_KEY || ""}
-              strokeWidth={3}
-              strokeColor='blue'
+              strokeWidth={4}
+              strokeColor='red'
             />
           )}
           {destination?.location && (
@@ -45,19 +51,18 @@ const Satellite = () => {
               }}
               title="Destination"
               description={destination.description}
-              identifier='Destination'
+              identifier='destination'
             />
           )}
-
           {origin?.location && (
             <Marker
               coordinate={{
                 latitude: origin.location.lat,
                 longitude: origin.location.lng
               }}
-              title="Origin"
+              title="Your Location"
               description={origin.description}
-              identifier='Origin'
+              identifier='origin'
             />
           )}
     </MapView>

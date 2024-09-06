@@ -169,7 +169,7 @@ export default function Vehicle() {
                     <TouchableOpacity style={[styles.button, styles.disconnect]} onPress={() => open()}>
                         <Text style={styles.headerText}>Disconnect Wallet</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.next} onPress={() => router.push("/screens/Map")}>
+                    <TouchableOpacity style={styles.next} onPress={() => router.push("/screens/map")}>
                         <Text style={styles.buttonText} >Done -&gt;</Text>
                     </TouchableOpacity>
                 </View>

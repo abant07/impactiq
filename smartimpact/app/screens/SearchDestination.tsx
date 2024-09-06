@@ -1,13 +1,13 @@
-import { StyleSheet, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, View, Text } from 'react-native'
+import React, { useState } from 'react'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { useDispatch } from 'react-redux'
 import { setDestination } from '../../slices/navSlice'
-import { useNavigation } from '@react-navigation/native'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 const SearchDestination = () => {
+    const [destination, setDest] = useState("");
     const dispatch = useDispatch()
-    const navigation = useNavigation()
 
     return (
         <View style={styles.container}>
@@ -22,7 +22,7 @@ const SearchDestination = () => {
                         location: details?.geometry.location,
                         description: data.description
                     }))
-                    navigation.navigate('ChooseVehicle')
+                    setDest(data.description)
                 }}
                 minLength={2}
                 enablePoweredByContainer={false}
@@ -30,7 +30,18 @@ const SearchDestination = () => {
                     key: process.env.EXPO_PUBLIC_GOOGLE_API_KEY,
                     language: "en"
                 }}
+                textInputProps={{
+                    placeholderTextColor: "#000", // Ensure placeholder text is black
+                    clearButtonMode: "always"
+                }}
             />
+            {destination && (
+                <TouchableOpacity style={styles.start}>
+                    <Text>
+                        Start Route
+                    </Text>
+                </TouchableOpacity>
+            )}
         </View>
     )
 }
@@ -46,7 +57,7 @@ const toInputBoxStyles = StyleSheet.create({
     textInput : {
         backgroundColor: "#DDDDDF",
         borderRadius: 50,
-        fontSize: 18
+        fontSize: 16
     },
     textInputContainer: {
         paddingHorizontal: 20,
@@ -58,5 +69,20 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: "#292D3E",
         flex: 1, // This ensures the background color extends to the entire component
+    },
+    start: {
+        backgroundColor: "white",
+        paddingVertical: 15,
+        width: 200,
+        borderRadius: 50,
+        justifyContent: "center",
+        textAlign: "center",
+        alignItems: "center",
+        alignSelf: "center",
+        shadowOpacity: 0.5,
+        color: "black",
+        shadowColor: "white",
+        shadowOffset: { width: 0, height: 5 },
+        marginTop: 100
     }
 })
