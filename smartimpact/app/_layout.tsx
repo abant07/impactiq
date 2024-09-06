@@ -61,7 +61,7 @@ export default function RootLayout() {
               <Provider store={store}>
                 <Stack>
                   <Stack.Screen name="index" options={{ headerShown: false }} />
-                  <Stack.Screen name="screens/map" options={{ title: "", headerBackTitle: "Go to Permissions", headerStyle: {backgroundColor: "black"}, headerTintColor: "white" }} />
+                  <Stack.Screen name="screens/Map" options={{ title: "", headerBackTitle: "Go to Permissions", headerStyle: {backgroundColor: "black"}, headerTintColor: "white" }} />
                 </Stack>
               </Provider>
               <Web3Modal />

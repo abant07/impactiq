@@ -123,7 +123,7 @@ export async function userVehicle(ownerAddress: string) {
     // TODO: replace address with ${ownerAddress}
     const myQuery = `
         {
-            vehicles(first: 10, filterBy: {owner: "0xf9D26323Ab49179A6d57C26515B01De018553787"}) { 
+            vehicles(first: 10, filterBy: {privileged: "0x7516c0358EbaBf58122c59D9068dEEc25332f946", owner: "0xf9D26323Ab49179A6d57C26515B01De018553787"}) { 
                 nodes {
                     tokenId
                     owner
@@ -158,7 +158,7 @@ export async function userVehicle(ownerAddress: string) {
     }
 }
 
-export async function getCredentials(tokenId: string) {
+export async function getAccessKeys(tokenId: string) {
     const url = "https://auth.dimo.zone/auth/web3/generate_challenge?client_id=0x7516c0358EbaBf58122c59D9068dEEc25332f946&domain=http://www.localhost:3000/&scope=openid email&response_type=code&address=0x7516c0358EbaBf58122c59D9068dEEc25332f946";
     
     try {
@@ -201,15 +201,23 @@ export async function getCredentials(tokenId: string) {
             body: body,
         });
         let responseData = await submit.json();
-        const access_token = responseData.access_token;
+        return responseData.access_token;
 
+    } catch (error) {
+        console.error('Error fetching access key data:', error);
+        throw error;
+    }
+}
+
+export async function getPriviledgeKeys(access_token: string, tokenId: number) {
+    try {
         const token_exchange_url = "https://token-exchange-api.dimo.zone/v1/tokens/exchange"
-        param = {
+        let param = {
             nftContractAddress: '0xbA5738a18d83D41847dfFbDC6101d37C69c9B0cF',
             privileges: [1, 3, 4, 6],
             tokenId: tokenId,
         };
-        body = new URLSearchParams(param).toString();
+        let body = new URLSearchParams(param).toString();
 
         const exchange = await fetch(token_exchange_url, {
             method: 'POST',
@@ -219,14 +227,49 @@ export async function getCredentials(tokenId: string) {
             },
             body: body,
         });
-        responseData = await submit.json();
-
-        console.log(responseData.token)
-
-        return {"access": access_token, "priviledge": responseData.token}
+        const responseData = await exchange.json();
+        return responseData.token
 
     } catch (error) {
         console.error('Error fetching data:', error);
+        throw error;
+    }
+}
+
+export async function getTelemetry(priviledged: string, tokenId: number) {
+    const url = "https://telemetry-api.dimo.zone/query"
+    const myQuery = `
+        query {
+            signals(
+                    tokenId: ${tokenId},
+                    from: "2024-05-07T09:21:19Z", 
+                    to: "2024-05-10T09:21:19Z",
+                    interval: "24h" 
+                )
+            {
+                currentLocationLatitude(agg: RAND)
+                currentLocationLongitude(agg: RAND)
+            }
+        }
+    `;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': "Bearer " + priviledged,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query: myQuery }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.data.signals[0]
+    } catch (error) {
+        console.error('Error fetching telemetry:', error);
         throw error;
     }
 }

@@ -2,7 +2,7 @@ import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { useAccount } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi-react-native';
 import { useFonts } from 'expo-font';
-import Vehicle from './vehicles';
+import Vehicle from './Vehicles';
 
 export default function Connect() {
     const { open } = useWeb3Modal();
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     connect: {
-        backgroundColor: "#1F2937",
+        backgroundColor: "#292D3E",
         paddingVertical: 15,
         paddingHorizontal: 80,
         borderRadius: 50,

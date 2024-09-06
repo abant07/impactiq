@@ -4,7 +4,7 @@ import { useWeb3Modal } from '@web3modal/wagmi-react-native';
 import { useFonts } from 'expo-font';
 import React, { useState, useEffect } from 'react';
 import { vehicles, vehicleStats } from '../../components/apis';
-import Connect from './connect';
+import Connect from './Connect';
 import dimoABI from "../../components/abi.json";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
@@ -141,8 +141,8 @@ export default function Vehicle() {
                                 {selectedVehicleDetails.attributes.map((attr, index) => (
                                     <Text key={index} style={styles.modalText}>{attr.name}: {attr.value}</Text>
                                 ))}
-                                <Text style={styles.modalText}>Permission to Expire:</Text>
                                 <View style={styles.horizontalContainer}>
+                                    <Text style={styles.modalText}>Expire Data:</Text>
                                     <DateTimePicker
                                         testID="dateTimePicker"
                                         value={date}
@@ -169,7 +169,7 @@ export default function Vehicle() {
                     <TouchableOpacity style={[styles.button, styles.disconnect]} onPress={() => open()}>
                         <Text style={styles.headerText}>Disconnect Wallet</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.next} onPress={() => router.push("/screens/map")}>
+                    <TouchableOpacity style={styles.next} onPress={() => router.push("/screens/Map")}>
                         <Text style={styles.buttonText} >Done -&gt;</Text>
                     </TouchableOpacity>
                 </View>
@@ -206,20 +206,18 @@ const styles = StyleSheet.create({
     },
     headerText: {
         color: "white",
-        fontSize: 14,
-        fontFamily: "SpaceMono-Regular",
+        fontSize: 16,
     },
     title: {
         color: "white",
         fontSize: 25,
         textAlign: "center",
-        fontFamily: "Courier New",
+        fontFamily: "SpaceMono-Regular",
     },
     subtitle: {
         color: "white",
         fontSize: 17,
         textAlign: "center",
-        fontFamily: "Courier New",
         paddingBottom: 30
     },
     radioContainer: {
@@ -227,7 +225,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     radioButton: {
-        backgroundColor: "#1F2937",
+        backgroundColor: "#1E2132",
         paddingVertical: 20,
         borderRadius: 10,
         marginVertical: 8,
@@ -240,18 +238,13 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 5 },
     },
-    selectedRadioButton: {
-        backgroundColor: "#2EE59D",
-    },
     radioText: {
         color: "#E5E7EB",
         fontSize: 17,
-        fontFamily: "SpaceMono-Regular",
     },
     noVehiclesText: {
         color: "white",
         fontSize: 20,
-        fontFamily: "SpaceMono-Regular",
         textAlign: "center",
         marginVertical: 20,
     },
@@ -272,7 +265,6 @@ const styles = StyleSheet.create({
     buttonText: {
         color: "#030507",
         fontSize: 15,
-        fontFamily: "SpaceMono-Regular",
     },
     modalView: {
         margin: 20,
@@ -293,7 +285,6 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         textAlign: "center",
         fontSize: 18,
-        fontFamily: "SpaceMono-Regular",
     },
     closeIcon: {
         position: 'absolute',
@@ -308,7 +299,7 @@ const styles = StyleSheet.create({
         color: "#000",
     },
     disconnect: {
-        backgroundColor: "#2196F3",
+        backgroundColor: "#1E2132",
         paddingVertical: 15,
         marginStart: 10,
         width: '65%',
@@ -339,7 +330,6 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         textAlign: "center",
         fontSize: 35,
-        fontFamily: "SpaceMono-Regular"
     },
     bottomHorizontalContainer: {
         flexDirection: 'row',

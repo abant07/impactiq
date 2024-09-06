@@ -11,7 +11,7 @@ const Satellite = () => {
   const mapRef = useRef(null)
 
   useEffect(() => {
-    if (!origin && !destination) return;
+    if (!origin || !destination) return;
 
     mapRef.current.fitToSuppliedMarkers(['origin', 'destination'], {
       edgePadding: {top: 50, right: 50, bottom: 50, left: 50}
@@ -20,7 +20,8 @@ const Satellite = () => {
 
   return (
     <MapView
-        style={tw`flex-1 bg-black`}
+        ref={mapRef}
+        style={tw`flex-1`}
         initialRegion={{
           latitude: destination?.location.lat || 37.7825,
           longitude: destination?.location.lng || -122.4324,
@@ -45,6 +46,18 @@ const Satellite = () => {
               title="Destination"
               description={destination.description}
               identifier='Destination'
+            />
+          )}
+
+          {origin?.location && (
+            <Marker
+              coordinate={{
+                latitude: origin.location.lat,
+                longitude: origin.location.lng
+              }}
+              title="Origin"
+              description={origin.description}
+              identifier='Origin'
             />
           )}
     </MapView>

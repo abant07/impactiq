@@ -1,12 +1,19 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import {userVehicle, getCredentials} from "../../components/apis"
+import { userVehicle, getAccessKeys, getPriviledgeKeys, getTelemetry } from "../../components/apis";
 import { ScrollView } from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux'
+import { setOrigin } from '@/slices/navSlice';
 
 const ChooseVehicle = () => {
   const [vehicleData, setVehicleData] = useState([]);
+  const [selectedVehicleId, setSelectedVehicleId] = useState(null);
   const { address } = useAccount();
+  const navigation = useNavigation()
+  const dispatch = useDispatch()
+
   useEffect(() => {
     const getVehicles = async () => {
         try {
@@ -17,79 +24,135 @@ const ChooseVehicle = () => {
         }
     };
     getVehicles()
-        .catch(()=>console.log("Error with getting vehicles"))
+        .catch(() => console.log("Error with getting vehicles"));
   }, []);
 
-  const handleRadioSelect = async (vehicleId: string) => {
+  const handleRadioSelect = async (vehicleId) => {
     try {
-        const data = await getCredentials(vehicleId);
+        let data = await getAccessKeys(vehicleId);
+        data = await getPriviledgeKeys(data, vehicleId)
+        const {currentLocationLatitude, currentLocationLongitude} = await getTelemetry(data, vehicleId)
+        dispatch(setOrigin({
+            location: {lat: currentLocationLatitude, lng: currentLocationLongitude},
+            description: "Trip Origin"
+        }))
+        setSelectedVehicleId(vehicleId);
     } catch (error) {
         console.error('Error fetching vehicle stats:', error);
     }
   };
 
   return (
-    <ScrollView>
-        {vehicleData.length > 0 ? (
-            <View style={styles.radioContainer}>
-                {vehicleData.map((vehicle) => (
-                    <TouchableOpacity
-                        key={vehicle.tokenId}
-                        style={[
-                            styles.radioButton,
-                        ]}
-                        onPress={() => {
-                            handleRadioSelect(vehicle.tokenId)
-                        }}
-                    >
-                        <Text style={styles.radioText}>
-                            #{vehicle.tokenId} {vehicle.definition.make} {vehicle.definition.model} {vehicle.definition.year}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
-        ) : (
-            <Text style={styles.noVehiclesText}>No vehicle data has been permitted for crash detection. Please make sure to enable permissions</Text>
-        )}
-    </ScrollView>
-  )
+    <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+            {vehicleData.length > 0 ? (
+                <View style={styles.radioContainer}>
+                    {selectedVehicleId && (
+                        <TouchableOpacity style={styles.continue} onPress={async () => {
+                            navigation.navigate('SearchDestination')
+                        }}>
+                            <Text>
+                                Continue-&gt;
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+                    <Text style={styles.noVehiclesText}>
+                        Choose a vehicle that you are driving today
+                    </Text>
+                    {vehicleData.map((vehicle) => (
+                        <TouchableOpacity
+                            key={vehicle.tokenId}
+                            style={[
+                                styles.radioButton,
+                                selectedVehicleId === vehicle.tokenId && styles.selectedRadioButton,
+                            ]}
+                            onPress={() => handleRadioSelect(vehicle.tokenId)}
+                        >
+                            <View style={styles.radioContent}>
+                                <Text style={styles.radioText}>
+                                    {vehicle.definition.make} {vehicle.definition.model} {vehicle.definition.year}
+                                </Text>
+                                {selectedVehicleId === vehicle.tokenId && (
+                                    <Text style={styles.carEmoji}>🚗</Text>
+                                )}
+                            </View>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            ) : (
+                <Text style={styles.noVehiclesText}>
+                    No vehicle data has been permitted for crash detection. Please make sure to enable permissions.
+                </Text>
+            )}
+        </ScrollView>
+    </View>
+  );
 }
 
-export default ChooseVehicle
+export default ChooseVehicle;
 
 const styles = StyleSheet.create({
-
+  container: {
+      flex: 1,  // Ensures the container takes up the full height of the screen
+      backgroundColor: '#1E2132',  // Dark background color to match the image style
+      padding: 20,
+  },
+  scrollContent: {
+      flexGrow: 1,  // Ensures the ScrollView content expands to fill the available space
+      justifyContent: 'space-between',  // Makes sure content is spaced nicely
+  },
   radioContainer: {
-      alignItems: "center",
       marginBottom: 30,
   },
   radioButton: {
-      backgroundColor: "#1F2937",
+      backgroundColor: "#292D3E",  // Unselected button background color
       paddingVertical: 20,
+      paddingHorizontal: 15,
       borderRadius: 10,
       marginVertical: 8,
       width: '100%',
+      flexDirection: 'row',
       alignItems: "center",
-      justifyContent: "center",
-      shadowColor: 'white',
-      shadowOpacity: 0.3,
-      elevation: 8,
-      shadowRadius: 10,
-      shadowOffset: { width: 0, height: 5 },
+      justifyContent: "space-between",
+      borderWidth: 2,
+      borderColor: 'transparent',
   },
   selectedRadioButton: {
-      backgroundColor: "#2EE59D",
+      borderColor: "#00A6FF",  // Border color for the selected button
+      backgroundColor: "#334056",  // Selected button background color
+  },
+  radioContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '100%',
   },
   radioText: {
-      color: "#E5E7EB",
-      fontSize: 17,
-      fontFamily: "SpaceMono-Regular",
+      color: "#FFFFFF",  // White text color
+      fontSize: 16,
+      fontWeight: '600',
+  },
+  carEmoji: {
+      fontSize: 24,
+      marginLeft: 10,
   },
   noVehiclesText: {
-      color: "black",
-      fontSize: 20,
-      fontFamily: "SpaceMono-Regular",
+      color: "#FFFFFF",
+      fontSize: 16,
       textAlign: "center",
       marginVertical: 20,
+  },
+  continue: {
+    backgroundColor: "#2EE59D",
+    width: 100,
+    height: 50,
+    paddingVertical: 15,
+    borderRadius: 50,
+    justifyContent: "center",
+    textAlign: "center",
+    alignItems: "center",
+    alignSelf: "flex-end",
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 5 },
   }
 });
