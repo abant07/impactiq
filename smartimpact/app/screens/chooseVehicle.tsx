@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { userVehicle, getAccessKeys, getPriviledgeKeys, getTelemetry } from "../../components/apis";
+import { userVehicle, getAccessKeys } from "../../components/apis";
 import { ScrollView } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux'
-import { setOrigin } from '@/slices/navSlice';
+import { setVehicle, setAccess, setDestination, setOrigin } from '@/slices/navSlice';
 
 const ChooseVehicle = () => {
   const [vehicleData, setVehicleData] = useState([]);
@@ -19,6 +19,8 @@ const ChooseVehicle = () => {
         try {
             const data = await userVehicle(address ? address : "");
             setVehicleData(data.data.vehicles.nodes);
+            dispatch(setOrigin(null))
+            dispatch(setDestination(null))
         } catch (error) {
             console.error('Error fetching vehicles:', error);
         }
@@ -28,19 +30,11 @@ const ChooseVehicle = () => {
         .catch(() => console.log("Error with getting vehicles"));
   }, []);
 
-  const handleRadioSelect = async (vehicleId) => {
-    try {
-        let data = await getAccessKeys(vehicleId);
-        data = await getPriviledgeKeys(data, vehicleId)
-        const {currentLocationLatitude, currentLocationLongitude} = await getTelemetry(data, vehicleId)
-        dispatch(setOrigin({
-            location: {lat: currentLocationLatitude, lng: currentLocationLongitude},
-            description: `(${currentLocationLatitude},${currentLocationLongitude})`
-        }))
-        setSelectedVehicleId(vehicleId);
-    } catch (error) {
-        console.error('Error fetching vehicle stats:', error);
-    }
+  const handleRadioSelect = async (vehicleId: number) => {
+    setSelectedVehicleId(vehicleId);
+    dispatch(setVehicle(vehicleId))
+    let data = await getAccessKeys(vehicleId);
+    dispatch(setAccess(data))
   };
 
   return (

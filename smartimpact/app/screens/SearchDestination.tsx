@@ -1,13 +1,41 @@
 import { StyleSheet, View, Text } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { useDispatch } from 'react-redux'
-import { setDestination } from '../../slices/navSlice'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { getPriviledgeKeys, getTelemetry } from "../../components/apis";
+import { setOrigin, selectAccess, selectVehicle, setDestination } from '@/slices/navSlice';
+import { useSelector } from 'react-redux'
 
 const SearchDestination = () => {
     const [destination, setDest] = useState("");
     const dispatch = useDispatch()
+    const access = useSelector(selectAccess)
+    const vehicleid = useSelector(selectVehicle)
+
+    const startRoute = async () => {
+        
+        //start the GPS route where it shows the current location of the user along the path.
+    }
+
+    useEffect(() => {
+        const getOrigin = async () => {
+            try {
+                const data = await getPriviledgeKeys(access, vehicleid)
+                const {currentLocationLatitude, currentLocationLongitude} = await getTelemetry(data, vehicleid)
+                dispatch(setOrigin({
+                    location: {lat: currentLocationLatitude, lng: currentLocationLongitude},
+                    description: `(${currentLocationLatitude},${currentLocationLongitude})`
+                }))
+
+            } catch (error) {
+                console.error('Error fetching vehicle stats:', error);
+            }
+        }
+        
+        getOrigin()
+            .catch(() => console.log())
+    }, [])
 
     return (
         <View style={styles.container}>
@@ -36,7 +64,7 @@ const SearchDestination = () => {
                 }}
             />
             {destination && (
-                <TouchableOpacity style={styles.start}>
+                <TouchableOpacity style={styles.start} onPress={() => {startRoute()}}>
                     <Text>
                         Start Route
                     </Text>
