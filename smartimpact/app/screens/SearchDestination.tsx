@@ -1,15 +1,18 @@
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, Text } from 'react-native'
 import React, { useEffect } from 'react'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { useDispatch } from 'react-redux'
 import { getPriviledgeKeys, getTelemetry } from "../../components/apis";
-import { setOrigin, selectAccess, selectVehicle, setDestination } from '@/slices/navSlice';
+import { setOrigin, selectAccess, selectVehicle, setDestination, selectDistance, selectTravelTimeInformation } from '@/slices/navSlice';
 import { useSelector } from 'react-redux'
 
 const SearchDestination = () => {
     const dispatch = useDispatch()
     const access = useSelector(selectAccess)
     const vehicleid = useSelector(selectVehicle)
+    const duration = useSelector(selectTravelTimeInformation)
+    const distance = useSelector(selectDistance)
+
 
     useEffect(() => {
         const getOrigin = async () => {
@@ -55,6 +58,17 @@ const SearchDestination = () => {
                     clearButtonMode: "always"
                 }}
             />
+            <View style={styles.vertcontainer}>
+                <Text style={styles.text}>
+                    Trip Details
+                </Text>
+                <Text style={styles.headerText}>
+                    Distance: {distance} km
+                </Text>
+                <Text style={styles.headerText}>
+                    Duration: {duration} min
+                </Text>
+            </View>
         </View>
     )
 }
@@ -97,5 +111,20 @@ const styles = StyleSheet.create({
         shadowColor: "white",
         shadowOffset: { width: 0, height: 5 },
         marginTop: 100
-    }
+    },
+    vertcontainer: {
+        padding: 10,
+    },
+    text: {
+        color: "white",
+        fontSize: 20,
+        textAlign: "center",
+        marginTop: 15
+    },
+    headerText: {
+        color: "white",
+        fontSize: 20,
+        marginBottom: 10,
+        marginTop: 10,
+    },
 })

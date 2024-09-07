@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import MapView, {AnimatedRegion, Marker} from 'react-native-maps'
 import tw from 'tailwind-react-native-classnames'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectDestination, selectOrigin } from '@/slices/navSlice'
+import { selectDestination, selectOrigin, setDistanceTravel, setTravelTimeInformation } from '@/slices/navSlice'
 import MapViewDirections from "react-native-maps-directions"
 import imagePath from '@/constants/imagePath'
 import { getLiveLocation } from '@/components/apis'
@@ -38,6 +38,12 @@ const Satellite = () => {
           longitudeDelta: 0.005
       })
     })
+    mapRef.current.animateToRegion({
+      latitude: origin.location.lat,
+      longitude: origin.location.lng,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005
+    })
 
     if (!origin || !destination) return;
 
@@ -47,14 +53,14 @@ const Satellite = () => {
       })
     }
 
-  }, [origin])
+  }, [origin, destination])
 
   useEffect(() => {
     getCurrentLocation()
   }, [])
 
   const getCurrentLocation = async () => {
-    if (!origin || !destination) return;
+    if ((!origin || !destination) && !startedRoute) return;
 
     const{ lat, lng} = await getLiveLocation(origin.location.lat, origin.location.lng)
     animate(lat, lng)
@@ -103,6 +109,13 @@ const Satellite = () => {
     })
   }
 
+  const zoomOut = () => {
+    setStartedRoute(false)
+    mapRef.current.fitToSuppliedMarkers(['origin', 'destination'], {
+      edgePadding: {right: 50, bottom: 50, left: 50, top: 50}
+    })
+  }
+
   return (
       <View style={tw`h-3/5`}>
           <MapView
@@ -120,9 +133,16 @@ const Satellite = () => {
                   latitude: origin.location.lat,
                   longitude: origin.location.lng
                 }}
+                
                 destination={{
                   latitude: destination.location.lat,
                   longitude: destination.location.lng
+                }}
+                onReady={result => {
+                  console.log(`Distance: ${result.distance} km`)
+                  console.log(`Duration: ${result.duration} min.`)
+                  dispatch(setTravelTimeInformation(result.duration))
+                  dispatch(setDistanceTravel(result.distance))
                 }}
                 apikey={process.env.EXPO_PUBLIC_GOOGLE_API_KEY || ""}
                 strokeWidth={4}
@@ -154,7 +174,7 @@ const Satellite = () => {
               />
             )}
         </MapView>
-        {destination && (
+        {destination && !startedRoute && (
             <TouchableOpacity style={{
               position: "absolute",
               bottom: 0,
@@ -163,6 +183,18 @@ const Satellite = () => {
             onPress={onCenter}
             >
             <Image source={imagePath.greenIndicator}/>
+          </TouchableOpacity>
+        )}
+
+        {destination && startedRoute && (
+            <TouchableOpacity style={{
+              position: "absolute",
+              bottom: 20,
+              right: 20
+            }}
+            onPress={zoomOut}
+            >
+            <Image source={imagePath.cancel}/>
           </TouchableOpacity>
         )}
       </View>

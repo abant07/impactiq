@@ -5,7 +5,8 @@ const initialState = {
     vehicle: null,
     origin: null,
     destination: null,
-    travelTimeInformation: null 
+    travelTimeInformation: null,
+    distance: null
 }
 
 
@@ -27,11 +28,14 @@ export const navSlice = createSlice({
         },
         setTravelTimeInformation: (state, action) => {
             state.travelTimeInformation = action.payload
+        },
+        setDistanceTravel: (state, action) => {
+            state.distance = action.payload
         }
     }
 })
 
-export const { setOrigin, setDestination, setTravelTimeInformation, setAccess, setVehicle } = navSlice.actions
+export const { setOrigin, setDestination, setTravelTimeInformation, setAccess, setVehicle, setDistanceTravel } = navSlice.actions
 
 
 // selectors
@@ -40,5 +44,6 @@ export const selectDestination = (state) => state.nav.destination
 export const selectTravelTimeInformation = (state) => state.nav.travelTimeInformation
 export const selectAccess = (state) => state.nav.access
 export const selectVehicle = (state) => state.nav.vehicle
+export const selectDistance = (state) => state.nav.distance
 
 export default navSlice.reducer

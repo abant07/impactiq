@@ -5,7 +5,7 @@ import { userVehicle, getAccessKeys } from "../../components/apis";
 import { ScrollView } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux'
-import { setVehicle, setAccess, setDestination, setOrigin } from '@/slices/navSlice';
+import { setVehicle, setAccess, setDestination, setOrigin, setDistanceTravel, setTravelTimeInformation } from '@/slices/navSlice';
 
 const ChooseVehicle = () => {
   const [vehicleData, setVehicleData] = useState([]);
@@ -21,6 +21,8 @@ const ChooseVehicle = () => {
             setVehicleData(data.data.vehicles.nodes);
             dispatch(setOrigin(null))
             dispatch(setDestination(null))
+            dispatch(setDistanceTravel(0))
+            dispatch(setTravelTimeInformation(0))
         } catch (error) {
             console.error('Error fetching vehicles:', error);
         }
