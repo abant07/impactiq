@@ -16,9 +16,7 @@ export default function Map() {
                     <Stack.Screen name="SearchDestination" component={SearchDestination} options={{ headerShown: false}}/>
                 </Stack.Navigator>
             </View>
-            <View style={tw`h-3/5`}>
-                <Satellite/>
-            </View>
+            <Satellite/>
         </View>
     )
 }

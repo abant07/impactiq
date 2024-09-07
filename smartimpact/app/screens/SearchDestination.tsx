@@ -1,22 +1,15 @@
-import { StyleSheet, View, Text } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { StyleSheet, View } from 'react-native'
+import React, { useEffect } from 'react'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { useDispatch } from 'react-redux'
-import { TouchableOpacity } from 'react-native-gesture-handler'
 import { getPriviledgeKeys, getTelemetry } from "../../components/apis";
 import { setOrigin, selectAccess, selectVehicle, setDestination } from '@/slices/navSlice';
 import { useSelector } from 'react-redux'
 
 const SearchDestination = () => {
-    const [destination, setDest] = useState("");
     const dispatch = useDispatch()
     const access = useSelector(selectAccess)
     const vehicleid = useSelector(selectVehicle)
-
-    const startRoute = async () => {
-        
-        //start the GPS route where it shows the current location of the user along the path.
-    }
 
     useEffect(() => {
         const getOrigin = async () => {
@@ -50,7 +43,6 @@ const SearchDestination = () => {
                         location: details?.geometry.location,
                         description: data.description
                     }))
-                    setDest(data.description)
                 }}
                 minLength={2}
                 enablePoweredByContainer={false}
@@ -59,17 +51,10 @@ const SearchDestination = () => {
                     language: "en"
                 }}
                 textInputProps={{
-                    placeholderTextColor: "#000", // Ensure placeholder text is black
+                    placeholderTextColor: "#000",
                     clearButtonMode: "always"
                 }}
             />
-            {destination && (
-                <TouchableOpacity style={styles.start} onPress={() => {startRoute()}}>
-                    <Text>
-                        Start Route
-                    </Text>
-                </TouchableOpacity>
-            )}
         </View>
     )
 }

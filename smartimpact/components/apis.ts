@@ -273,3 +273,7 @@ export async function getTelemetry(priviledged: string, tokenId: number) {
         throw error;
     }
 }
+
+export async function getLiveLocation(lat: number, long: number) {
+    return {lat: lat + 1, lng: long+1}
+}
