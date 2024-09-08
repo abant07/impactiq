@@ -1,10 +1,11 @@
 import { StyleSheet, View, Text } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { useDispatch } from 'react-redux'
 import { getPriviledgeKeys, getTelemetry } from "../../components/apis";
 import { setOrigin, selectAccess, selectVehicle, setDestination, selectDistance, selectTravelTimeInformation } from '@/slices/navSlice';
 import { useSelector } from 'react-redux'
+import EventSource from 'react-native-sse';
 
 const SearchDestination = () => {
     const dispatch = useDispatch()
@@ -12,6 +13,21 @@ const SearchDestination = () => {
     const vehicleid = useSelector(selectVehicle)
     const duration = useSelector(selectTravelTimeInformation)
     const distance = useSelector(selectDistance)
+
+    const [text, setText] = useState("")
+
+    useEffect(() => {
+        const eventSource = new EventSource('http://localhost:3000/events');
+
+        eventSource.addEventListener('message', (event) => {
+            console.log(event.data)
+            setText(event.data);
+        });
+
+        return () => {
+            eventSource.close();
+        };
+    }, []);
 
 
     useEffect(() => {
@@ -67,6 +83,9 @@ const SearchDestination = () => {
                 </Text>
                 <Text style={styles.headerText}>
                     Duration: {duration} min
+                </Text>
+                <Text style={styles.headerText}>
+                    {text}
                 </Text>
             </View>
         </View>
