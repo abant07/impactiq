@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { useDispatch } from 'react-redux'
 import { getPriviledgeKeys, getTelemetry, getAccessKeys } from "../../components/apis";
-import { setOrigin, setAccess, selectVehicle, setDestination, selectDistance, selectTravelTimeInformation } from '@/slices/navSlice';
+import { setOrigin, selectVehicle, setDestination, selectDistance, selectTravelTimeInformation } from '@/slices/navSlice';
 import { useSelector } from 'react-redux'
 
 const SearchDestination = () => {
@@ -15,15 +15,13 @@ const SearchDestination = () => {
     useEffect(() => {
         const getOrigin = async () => {
             try {
-                const access = await getAccessKeys(vehicleid);
-                dispatch(setAccess(access))
+                const access = await getAccessKeys();
                 const data = await getPriviledgeKeys(access, vehicleid)
                 const {currentLocationLatitude, currentLocationLongitude} = await getTelemetry(data, vehicleid)
                 dispatch(setOrigin({
                     location: {lat: currentLocationLatitude, lng: currentLocationLongitude},
                     description: `(${currentLocationLatitude},${currentLocationLongitude})`
                 }))
-
             } catch (error) {
                 console.error('Error fetching vehicle stats:', error);
             }

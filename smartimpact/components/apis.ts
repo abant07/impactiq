@@ -6,7 +6,7 @@ export async function vehicles(ownerAddress: string) {
     // TODO: replace address with ${ownerAddress}
     const myQuery = `
         {
-            vehicles(first: 10, filterBy: {owner: "0xf9D26323Ab49179A6d57C26515B01De018553787"}) { 
+            vehicles(first: 100, filterBy: {owner: "0xf9D26323Ab49179A6d57C26515B01De018553787"}) { 
                 nodes {
                     tokenId
                     owner
@@ -158,7 +158,7 @@ export async function userVehicle(ownerAddress: string) {
     }
 }
 
-export async function getAccessKeys(tokenId: string) {
+export async function getAccessKeys() {
     const url = "https://auth.dimo.zone/auth/web3/generate_challenge?client_id=0x7516c0358EbaBf58122c59D9068dEEc25332f946&domain=http://www.localhost:3000/&scope=openid email&response_type=code&address=0x7516c0358EbaBf58122c59D9068dEEc25332f946";
     
     try {
@@ -239,22 +239,25 @@ export async function getPriviledgeKeys(access_token: string, tokenId: number) {
 export async function getTelemetry(priviledged: string, tokenId: number) {
     const url = "https://telemetry-api.dimo.zone/query"
     const myQuery = `
-        query {
-            signals(
-                    tokenId: ${tokenId},
-                    from: "2024-05-07T09:21:19Z", 
-                    to: "2024-05-10T09:21:19Z",
-                    interval: "24h" 
-                )
+        {  
+            signalsLatest(
+                tokenId: ${tokenId},
+                filter: {
+                    source: "macaron"
+                }
+            )
             {
-                currentLocationLatitude(agg: RAND)
-                currentLocationLongitude(agg: RAND)
+                currentLocationLatitude {
+                    value
+                }
+                currentLocationLongitude {
+                    value
+                }
             }
         }
     `;
 
     try {
-        console.log(priviledged)
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -268,7 +271,9 @@ export async function getTelemetry(priviledged: string, tokenId: number) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        return data.data.signals[0]
+        console.log(data.data.signalsLatest)
+        const formattedData = {"currentLocationLatitude": data.data.signalsLatest.currentLocationLatitude.value, "currentLocationLongitude": data.data.signalsLatest.currentLocationLongitude.value}
+        return formattedData
     } catch (error) {
         console.error('Error fetching telemetry:', error);
         throw error;

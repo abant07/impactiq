@@ -10,7 +10,7 @@ export default function Map() {
     const Stack = createStackNavigator()
     return (
         <View>
-            <View style={tw`h-2/5`}>
+            <View style={tw`h-2/6`}>
                 <Stack.Navigator screenOptions={{ title: "", headerBackTitle: "Back", headerStyle: {backgroundColor: "#292D3E"}, headerTintColor: "white" }}>
                     <Stack.Screen name="ChooseVehicle" component={ChooseVehicle} options={{ headerShown: false }}/>
                     <Stack.Screen name="SearchDestination" component={SearchDestination} />

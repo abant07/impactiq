@@ -34,8 +34,8 @@ const Satellite = () => {
         coordinate: new AnimatedRegion( {
           latitude: origin.location.lat,
           longitude: origin.location.lng,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05
       })
     })
     mapRef.current.animateToRegion({
@@ -56,11 +56,6 @@ const Satellite = () => {
   }, [origin, destination])
 
   useEffect(() => {
-    setStartedRoute(false)
-    // TODO:
-    // execute crash logic
-    // get actual car data
-    // get private key once it expires? do we need it for streaming? How much data does streaming give. may need to call telemetry api and filter based on timestamp
     const eventSource = new EventSource(`http://10.0.0.44:3000/events?tokenId=${vehicleid}`);
     if ((!origin || !destination) && !startedRoute) return;
 
@@ -123,15 +118,15 @@ const Satellite = () => {
   }
 
   return (
-      <View style={tw`h-3/5`}>
+      <View style={tw`h-4/6`}>
           <MapView
           ref={mapRef}
-          style={tw`flex-1`}
+          style={tw`flex-1 rounded-lg`}
           initialRegion={{
             latitude: destination?.location.lat || 37.7825,
             longitude: destination?.location.lng || -122.4324,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
           }}>
             {origin && destination && (
               <MapViewDirections

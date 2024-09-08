@@ -24,8 +24,9 @@ app.get("/events", (req, res) => {
     
     client.subscribe(streamId, (message) => {
         console.log(message.data)
-        // write the crash logic and call telemetry api
-        res.write(`data: ${JSON.stringify(message.data)}\n\n`);
+        // write the crash logic
+        let crashed = detectCrash(message.data)
+        res.write(JSON.stringify({crash: crashed, data: message.data}));
     })
 
     req.on('close', () => {
@@ -41,3 +42,7 @@ app.post("/terminate", () => {
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
+function detectCrash(data) {
+    return true;
+}
