@@ -254,6 +254,7 @@ export async function getTelemetry(priviledged: string, tokenId: number) {
     `;
 
     try {
+        console.log(priviledged)
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -272,8 +273,4 @@ export async function getTelemetry(priviledged: string, tokenId: number) {
         console.error('Error fetching telemetry:', error);
         throw error;
     }
-}
-
-export async function getLiveLocation(lat: number, long: number) {
-    return {lat: lat, lng: long}
 }

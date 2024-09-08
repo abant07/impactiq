@@ -1,38 +1,22 @@
 import { StyleSheet, View, Text } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete'
 import { useDispatch } from 'react-redux'
-import { getPriviledgeKeys, getTelemetry } from "../../components/apis";
-import { setOrigin, selectAccess, selectVehicle, setDestination, selectDistance, selectTravelTimeInformation } from '@/slices/navSlice';
+import { getPriviledgeKeys, getTelemetry, getAccessKeys } from "../../components/apis";
+import { setOrigin, setAccess, selectVehicle, setDestination, selectDistance, selectTravelTimeInformation } from '@/slices/navSlice';
 import { useSelector } from 'react-redux'
-import EventSource from 'react-native-sse';
 
 const SearchDestination = () => {
     const dispatch = useDispatch()
-    const access = useSelector(selectAccess)
     const vehicleid = useSelector(selectVehicle)
     const duration = useSelector(selectTravelTimeInformation)
     const distance = useSelector(selectDistance)
 
-    const [text, setText] = useState("")
-
-    useEffect(() => {
-        const eventSource = new EventSource('http://localhost:3000/events');
-
-        eventSource.addEventListener('message', (event) => {
-            console.log(event.data)
-            setText(event.data);
-        });
-
-        return () => {
-            eventSource.close();
-        };
-    }, []);
-
-
     useEffect(() => {
         const getOrigin = async () => {
             try {
+                const access = await getAccessKeys(vehicleid);
+                dispatch(setAccess(access))
                 const data = await getPriviledgeKeys(access, vehicleid)
                 const {currentLocationLatitude, currentLocationLongitude} = await getTelemetry(data, vehicleid)
                 dispatch(setOrigin({
@@ -84,9 +68,6 @@ const SearchDestination = () => {
                 <Text style={styles.headerText}>
                     Duration: {duration} min
                 </Text>
-                <Text style={styles.headerText}>
-                    {text}
-                </Text>
             </View>
         </View>
     )
@@ -114,7 +95,7 @@ const toInputBoxStyles = StyleSheet.create({
 const styles = StyleSheet.create({
     container: {
         backgroundColor: "#292D3E",
-        flex: 1, // This ensures the background color extends to the entire component
+        flex: 1,
     },
     start: {
         backgroundColor: "white",

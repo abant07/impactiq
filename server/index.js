@@ -17,21 +17,27 @@ app.get("/events", (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+
+    const { tokenId } = req.query;
     
-    const streamId = 'streams.dimo.eth/firehose/weather';
+    const streamId = `streams.dimo.eth/vehicle/${tokenId}`;
     
     client.subscribe(streamId, (message) => {
-        console.log(message.data.ambientTemp)
-        res.write(`data: ${message.data.ambientTemp}\n\n`);
+        console.log(message.data)
+        // write the crash logic and call telemetry api
+        res.write(`data: ${JSON.stringify(message.data)}\n\n`);
     })
 
-    // Close connection
     req.on('close', () => {
         client.unsubscribe();
         res.end();
     });
 })
 
+app.post("/terminate", () => {
+    client.unsubscribe();
+})
+
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server running on port ${port}`);
 });

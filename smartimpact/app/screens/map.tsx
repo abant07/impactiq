@@ -11,9 +11,9 @@ export default function Map() {
     return (
         <View>
             <View style={tw`h-2/5`}>
-                <Stack.Navigator screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="ChooseVehicle" component={ChooseVehicle} options={{ headerShown: false}} />
-                    <Stack.Screen name="SearchDestination" component={SearchDestination} options={{ headerShown: false}}/>
+                <Stack.Navigator screenOptions={{ title: "", headerBackTitle: "Back", headerStyle: {backgroundColor: "#292D3E"}, headerTintColor: "white" }}>
+                    <Stack.Screen name="ChooseVehicle" component={ChooseVehicle} options={{ headerShown: false }}/>
+                    <Stack.Screen name="SearchDestination" component={SearchDestination} />
                 </Stack.Navigator>
             </View>
             <Satellite/>

@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { userVehicle, getAccessKeys } from "../../components/apis";
+import { userVehicle } from "../../components/apis";
 import { ScrollView } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux'
-import { setVehicle, setAccess, setDestination, setOrigin, setDistanceTravel, setTravelTimeInformation } from '@/slices/navSlice';
+import { setVehicle, setDestination, setOrigin, setDistanceTravel, setTravelTimeInformation } from '@/slices/navSlice';
 
 const ChooseVehicle = () => {
   const [vehicleData, setVehicleData] = useState([]);
@@ -35,8 +35,6 @@ const ChooseVehicle = () => {
   const handleRadioSelect = async (vehicleId: number) => {
     setSelectedVehicleId(vehicleId);
     dispatch(setVehicle(vehicleId))
-    let data = await getAccessKeys(vehicleId);
-    dispatch(setAccess(data))
   };
 
   return (
@@ -45,7 +43,11 @@ const ChooseVehicle = () => {
             {vehicleData.length > 0 ? (
                 <View style={styles.radioContainer}>
                     {selectedVehicleId && (
-                        <TouchableOpacity style={styles.continue} onPress={async () => {
+                        <TouchableOpacity style={styles.continue} onPress={() => {
+                            fetch('http://10.0.0.44:3000/terminate', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' }
+                            });
                             navigation.navigate('SearchDestination')
                         }}>
                             <Text>
