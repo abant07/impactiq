@@ -19,24 +19,45 @@ app.get("/events", (req, res) => {
     res.setHeader('Connection', 'keep-alive');
 
     const { tokenId } = req.query;
-    
-    const streamId = `streams.dimo.eth/vehicle/${tokenId}`;
+
+    const streamId = `streams.dimo.eth/vehicle/$${tokenId}`;
     
     client.subscribe(streamId, (message) => {
         console.log(message.data)
-        // write the crash logic
         let crashed = detectCrash(message.data)
-        res.write(JSON.stringify({crash: crashed, data: message.data}));
+        res.write(`data: ${JSON.stringify({crash: crashed, telemetry: {latitude: message.data.currentLocationLatitude, longitude: message.data.currentLocationLongitude}})}\n\n`);
     })
 
     req.on('close', () => {
-        client.unsubscribe();
+        client.unsubscribe(streamId);
         res.end();
     });
 })
 
-app.post("/terminate", () => {
-    client.unsubscribe();
+app.get("/test", (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    
+    const telemetry = ""
+    const data = telemetry.split(", ")
+    let index = 0
+    const sendWords = () => {
+        if(index < data.length) {
+            res.write(`data: ${data[index]}\n\n`)
+            index++
+        }
+        else {
+            clearInterval(interval)
+        }
+    }
+
+    const interval = setInterval(sendWords, 500)
+
+    req.on("close", () => {
+        clearInterval(interval)
+        res.end()
+    })
 })
 
 app.listen(port, () => {

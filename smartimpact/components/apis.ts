@@ -271,7 +271,6 @@ export async function getTelemetry(priviledged: string, tokenId: number) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data.data.signalsLatest)
         const formattedData = {"currentLocationLatitude": data.data.signalsLatest.currentLocationLatitude.value, "currentLocationLongitude": data.data.signalsLatest.currentLocationLongitude.value}
         return formattedData
     } catch (error) {

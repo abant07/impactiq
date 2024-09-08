@@ -44,10 +44,6 @@ const ChooseVehicle = () => {
                 <View style={styles.radioContainer}>
                     {selectedVehicleId && (
                         <TouchableOpacity style={styles.continue} onPress={() => {
-                            fetch('http://10.0.0.44:3000/terminate', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' }
-                            });
                             navigation.navigate('SearchDestination')
                         }}>
                             <Text>

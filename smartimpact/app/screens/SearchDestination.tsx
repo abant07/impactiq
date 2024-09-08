@@ -61,10 +61,10 @@ const SearchDestination = () => {
                     Trip Details
                 </Text>
                 <Text style={styles.headerText}>
-                    Distance: {distance} km
+                    Distance: {Math.round(distance)} km
                 </Text>
                 <Text style={styles.headerText}>
-                    Duration: {duration} min
+                    Duration: {Math.round(duration)} min
                 </Text>
             </View>
         </View>
@@ -75,7 +75,7 @@ export default SearchDestination
 
 const toInputBoxStyles = StyleSheet.create({
     container: {
-        backgroundColor: "#292D3E",
+        backgroundColor: "#1E2132",
         paddingTop: 20,
         flex: 0
     },
@@ -92,7 +92,7 @@ const toInputBoxStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "#292D3E",
+        backgroundColor: "#1E2132",
         flex: 1,
     },
     start: {

@@ -6,7 +6,7 @@ import { selectDestination, selectOrigin, selectVehicle, setDistanceTravel, setT
 import MapViewDirections from "react-native-maps-directions"
 import imagePath from '@/constants/imagePath'
 import { setOrigin } from '@/slices/navSlice';
-import { Platform, View, TouchableOpacity, Image } from 'react-native'
+import { Platform, View, TouchableOpacity, Image, Modal, Text } from 'react-native'
 import EventSource from 'react-native-sse';
 
 const Satellite = () => {
@@ -25,7 +25,12 @@ const Satellite = () => {
       longitudeDelta: 0.05
     })
   })
+  const [showEmergencyAlert, setShowEmergencyAlert] = useState(false);
   const { coordinate } = state
+
+  useEffect(() => {
+    setStartedRoute(false)
+  }, [vehicleid])
 
   useEffect(() => {
     if (!origin) return
@@ -56,26 +61,31 @@ const Satellite = () => {
   }, [origin, destination])
 
   useEffect(() => {
-    const eventSource = new EventSource(`http://10.0.0.44:3000/events?tokenId=${vehicleid}`);
     if ((!origin || !destination) && !startedRoute) return;
-
+    const eventSource = new EventSource(`http://10.0.0.44:3000/events?tokenId=${vehicleid}`);
     if (origin && destination && !startedRoute) {
       eventSource.close();
     }
     else{
       eventSource.addEventListener('message', (event) => {
         const parsedData = JSON.parse(event.data);
-        animate(parsedData.latitude, parsedData.longitude)
+        console.log(parsedData)
+        if (parsedData.crash) {
+          setStartedRoute(false)
+          setShowEmergencyAlert(true);
+        }
+        const telemetryData = parsedData.telemetry
+        animate(parsedData.latitude, telemetryData.longitude)
         dispatch(setOrigin({
-          location: {lat: parsedData.latitude, lng: parsedData.longitude},
-          description: `(${parsedData.latitude},${parsedData.longitude})`
+          location: {lat: telemetryData.latitude, lng: telemetryData.longitude},
+          description: `(${telemetryData.latitude},${telemetryData.longitude})`
         }))
 
         setState({
           ...state,
             coordinate: new AnimatedRegion( {
-              latitude: parsedData.latitude,
-              longitude: parsedData.longitude,
+              latitude: telemetryData.latitude,
+              longitude: telemetryData.longitude,
               latitudeDelta: 0.05,
               longitudeDelta: 0.05
           })
@@ -118,66 +128,103 @@ const Satellite = () => {
   }
 
   return (
-      <View style={tw`h-4/6`}>
-          <MapView
-          ref={mapRef}
-          style={tw`flex-1 rounded-lg`}
-          initialRegion={{
-            latitude: destination?.location.lat || 37.7825,
-            longitude: destination?.location.lng || -122.4324,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          }}>
-            {origin && destination && (
-              <MapViewDirections
-                origin={{
-                  latitude: origin.location.lat,
-                  longitude: origin.location.lng
-                }}
-                
-                destination={{
-                  latitude: destination.location.lat,
-                  longitude: destination.location.lng
-                }}
-                onReady={result => {
-                  dispatch(setTravelTimeInformation(result.duration))
-                  dispatch(setDistanceTravel(result.distance))
-                }}
-                apikey={process.env.EXPO_PUBLIC_GOOGLE_API_KEY || ""}
-                strokeWidth={4}
-                strokeColor='red'
-                optimizeWaypoints={true}
-              />
-            )}
-            {destination?.location && (
-              <Marker
-                coordinate={{
-                  latitude: destination.location.lat,
-                  longitude: destination.location.lng
-                }}
-                image={imagePath.greenMarker}
-                title="Destination"
-                description={destination.description}
-                identifier='destination'
-              />
-            )}
+      <View style={[tw`h-4/6 p-4`, {backgroundColor: "#1E2132"}]}>
+        <View style={[tw`flex-1`, { borderRadius: 20, overflow: 'hidden' }]}>
+            <MapView
+            ref={mapRef}
+            style={tw`flex-1 rounded-lg`}
+            initialRegion={{
+              latitude: destination?.location.lat || 37.7825,
+              longitude: destination?.location.lng || -122.4324,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            }}>
+              {origin && destination && (
+                <MapViewDirections
+                  origin={{
+                    latitude: origin.location.lat,
+                    longitude: origin.location.lng
+                  }}
+                  
+                  destination={{
+                    latitude: destination.location.lat,
+                    longitude: destination.location.lng
+                  }}
+                  onReady={result => {
+                    dispatch(setTravelTimeInformation(result.duration))
+                    dispatch(setDistanceTravel(result.distance))
+                  }}
+                  apikey={process.env.EXPO_PUBLIC_GOOGLE_API_KEY || ""}
+                  strokeWidth={4}
+                  strokeColor='red'
+                  optimizeWaypoints={true}
+                />
+              )}
+              {destination?.location && (
+                <Marker
+                  coordinate={{
+                    latitude: destination.location.lat,
+                    longitude: destination.location.lng
+                  }}
+                  image={imagePath.greenMarker}
+                  title="Destination"
+                  description={destination.description}
+                  identifier='destination'
+                />
+              )}
 
-            {origin?.location && (
-              <Marker.Animated
-                ref={markerRef}
-                coordinate={coordinate}
-                image={imagePath.curLocation}
-                title="Your Location"
-                description={origin.description}
-                identifier='origin'
-              />
-            )}
-        </MapView>
+              {origin?.location && (
+                <Marker.Animated
+                  ref={markerRef}
+                  coordinate={coordinate}
+                  image={imagePath.curLocation}
+                  title="Your Location"
+                  description={origin.description}
+                  identifier='origin'
+                />
+              )}
+          </MapView>
+        </View>
+        <Modal
+          visible={showEmergencyAlert}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setShowEmergencyAlert(false)} // Handles back button on Android
+        >
+          <View style={tw`flex-1 justify-center items-center bg-black bg-opacity-50`}>
+            <View style={tw`bg-white p-6 rounded-lg w-80`}>
+              <Text style={tw`text-lg font-bold text-center mb-4`}>We think you got into a crash.</Text>
+              
+              <View style={tw`flex-row justify-between mt-4`}>
+                <TouchableOpacity
+                  style={[tw`py-2 px-4 rounded`, { backgroundColor: "red" }]}
+                  onPress={() => {
+                    // Handle Call 911 action
+                    setShowEmergencyAlert(false);
+                    // You can use Linking API to open phone dialer or trigger a call.
+                  }}
+                >
+                  <Text style={tw`text-white font-bold`}>Call 911</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[tw`py-2 px-4 rounded border`, { backgroundColor: "white", borderColor: "black" }]}
+                  onPress={() => {
+                    setShowEmergencyAlert(false)
+                    setStartedRoute(false)
+                  }} // Handle "I'm Okay!" action
+                >
+                  <Text style={tw`text-black font-bold`}>I'm Okay!</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
         {destination && !startedRoute && (
             <TouchableOpacity style={{
               position: "absolute",
-              bottom: 0,
-              right: 0
+              bottom: 10,
+              right: 10
             }}
             onPress={startRoute}
             >
@@ -188,8 +235,8 @@ const Satellite = () => {
         {destination && startedRoute && (
             <TouchableOpacity style={{
               position: "absolute",
-              bottom: 20,
-              right: 20
+              bottom: 30,
+              right: 30
             }}
             onPress={endRoute}
             >
