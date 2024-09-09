@@ -24,7 +24,7 @@ export default function HomeScreen() {
         return (
             <View style={styles.container}>
                 <Image style={styles.image} source={require('../assets/images/dimo.png')} />
-                <Text style={styles.text}>Log in with DIMO</Text>
+                <Text style={styles.text}>Instant Crash Detection</Text>
                 <TouchableOpacity style={styles.connect} onPress={() => open()}>
                     <Text style={styles.connectText}>{isConnecting ? "Connecting..." : "Connect Wallet"}</Text>
                 </TouchableOpacity>
