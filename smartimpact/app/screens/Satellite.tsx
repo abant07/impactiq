@@ -62,34 +62,36 @@ const Satellite = () => {
 
   useEffect(() => {
     if ((!origin || !destination) && !startedRoute) return;
-    const eventSource = new EventSource(`http://10.0.0.44:3000/events?tokenId=${vehicleid}`);
+    //const eventSource = new EventSource(`http://10.0.0.44:3000/events?tokenId=${vehicleid}`);
+    const eventSource = new EventSource(`http://10.0.0.44:3000/test`);
     if (origin && destination && !startedRoute) {
       eventSource.close();
     }
     else{
       eventSource.addEventListener('message', (event) => {
         const parsedData = JSON.parse(event.data);
-        console.log(parsedData)
         if (parsedData.crash) {
           setStartedRoute(false)
           setShowEmergencyAlert(true);
         }
+        /*
         const telemetryData = parsedData.telemetry
-        animate(parsedData.latitude, telemetryData.longitude)
+        animate(parsedData.currentLocationLatitude, telemetryData.currentLocationLongitude)
         dispatch(setOrigin({
-          location: {lat: telemetryData.latitude, lng: telemetryData.longitude},
-          description: `(${telemetryData.latitude},${telemetryData.longitude})`
+          location: {lat: telemetryData.currentLocationLatitude, lng: telemetryData.currentLocationLongitude},
+          description: `(${telemetryData.currentLocationLatitude},${telemetryData.currentLocationLongitude})`
         }))
 
         setState({
           ...state,
             coordinate: new AnimatedRegion( {
-              latitude: telemetryData.latitude,
-              longitude: telemetryData.longitude,
+              latitude: telemetryData.currentLocationLatitude,
+              longitude: telemetryData.currentLocationLongitude,
               latitudeDelta: 0.05,
               longitudeDelta: 0.05
           })
         })
+        */
       });
 
       return () => {
@@ -160,6 +162,7 @@ const Satellite = () => {
                   optimizeWaypoints={true}
                 />
               )}
+
               {destination?.location && (
                 <Marker
                   coordinate={{
@@ -201,7 +204,6 @@ const Satellite = () => {
                   onPress={() => {
                     // Handle Call 911 action
                     setShowEmergencyAlert(false);
-                    // You can use Linking API to open phone dialer or trigger a call.
                   }}
                 >
                   <Text style={tw`text-white font-bold`}>Call 911</Text>
@@ -211,8 +213,8 @@ const Satellite = () => {
                   style={[tw`py-2 px-4 rounded border`, { backgroundColor: "white", borderColor: "black" }]}
                   onPress={() => {
                     setShowEmergencyAlert(false)
-                    setStartedRoute(false)
-                  }} // Handle "I'm Okay!" action
+                    setStartedRoute(true)
+                  }}
                 >
                   <Text style={tw`text-black font-bold`}>I'm Okay!</Text>
                 </TouchableOpacity>
